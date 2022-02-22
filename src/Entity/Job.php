@@ -4,12 +4,15 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\JobRepository")
  * @ORM\Table(name="jobs")
  * @ORM\HasLifecycleCallbacks()
+ *
+ * @JMS\ExclusionPolicy("all")
  */
 class Job
 {
@@ -26,6 +29,9 @@ class Job
     /**
      * @var int
      *
+     * @JMS\Expose()
+     * @JMS\Type("int")
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -35,12 +41,18 @@ class Job
     /**
      * @var string
      *
+     * @JMS\Expose()
+     * @JMS\Type("string")
+     *
      * @ORM\Column(type="string", length=255)
      */
     private $type;
 
     /**
      * @var string
+     *
+     * @JMS\Expose()
+     * @JMS\Type("string")
      *
      * @ORM\Column(type="string", length=255)
      */
@@ -56,12 +68,18 @@ class Job
     /**
      * @var string|null
      *
+     * @JMS\Expose()
+     * @JMS\Type("string")
+     *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $url;
 
     /**
      * @var string
+     *
+     * @JMS\Expose()
+     * @JMS\Type("string")
      *
      * @ORM\Column(type="string", length=255)
      */
@@ -70,6 +88,9 @@ class Job
     /**
      * @var string
      *
+     * @JMS\Expose()
+     * @JMS\Type("string")
+     *
      * @ORM\Column(type="string", length=255)
      */
     private $location;
@@ -77,12 +98,18 @@ class Job
     /**
      * @var string
      *
+     * @JMS\Expose()
+     * @JMS\Type("string")
+     *
      * @ORM\Column(type="text")
      */
     private $description;
 
     /**
      * @var string
+     *
+     * @JMS\Expose()
+     * @JMS\Type("string")
      *
      * @ORM\Column(type="text")
      */
@@ -118,6 +145,9 @@ class Job
 
     /**
      * @var DateTime
+     *
+     * @JMS\Expose()
+     * @JMS\Type("DateTime")
      *
      * @ORM\Column(type="datetime")
      */
@@ -220,6 +250,17 @@ class Job
     public function getLogo()
     {
         return $this->logo;
+    }
+
+    /**
+     * @JMS\VirtualProperty
+     * @JMS\SerializedName("logo_path")
+     *
+     * @return string|null
+     */
+    public function getLogoPath()
+    {
+        return $this->getLogo() ? 'uploads/jobs/'.$this->getLogo() : null;
     }
 
     /**
@@ -456,6 +497,17 @@ class Job
     public function getCategory(): ?Category
     {
         return $this->category;
+    }
+
+    /**
+     * @JMS\VirtualProperty
+     * @JMS\SerializedName("category_name")
+     *
+     * @return string
+     */
+    public function getCategoryName()
+    {
+        return $this->getCategory()->getName();
     }
 
     /**
