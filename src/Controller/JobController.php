@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\FileUploader;
 use App\Entity\Category;
 use App\Entity\Job;
 use App\Form\JobType;
@@ -10,11 +9,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class JobController extends AbstractController
 {
@@ -22,6 +20,8 @@ class JobController extends AbstractController
      * Lists all job entities.
      *
      * @Route("/", name="job.list", methods="GET")
+     *
+     * @param EntityManagerInterface $em
      *
      * @return Response
      */
@@ -47,14 +47,8 @@ class JobController extends AbstractController
      */
     public function show(Job $job): Response
     {
-        $deleteForm = $this->createDeleteForm($job);
-        $publishForm = $this->createPublishForm($job);
-
         return $this->render('job/show.html.twig', [
             'job' => $job,
-            'hasControlAccess' => true,
-            'deleteForm' => $deleteForm->createView(),
-            'publishForm' => $publishForm->createView(),
         ]);
     }
 
@@ -119,7 +113,7 @@ class JobController extends AbstractController
      *
      * @return RedirectResponse|Response
      */
-    public function create(Request $request, EntityManagerInterface $em, FileUploader $fileUploader) : Response
+    public function create(Request $request, EntityManagerInterface $em): Response
     {
         $job = new Job();
 
@@ -127,15 +121,6 @@ class JobController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile|null $logoFile */
-            $logoFile = $form->get('logo')->getData();
-
-            if ($logoFile instanceof UploadedFile) {
-                $fileName = $fileUploader->upload($logoFile);
-
-                $job->setLogo($fileName);
-            }
-
             $em->persist($job);
             $em->flush();
 
@@ -223,7 +208,8 @@ class JobController extends AbstractController
      */
     private function createDeleteForm(Job $job): FormInterface
     {
-        return $this->createFormBuilder()
+        return $this
+            ->createFormBuilder()
             ->setAction($this->generateUrl('job.delete', ['token' => $job->getToken()]))
             ->setMethod('DELETE')
             ->getForm();
