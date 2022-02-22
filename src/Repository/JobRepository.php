@@ -16,7 +16,7 @@ class JobRepository extends EntityRepository
      *
      * @return AbstractQuery
      */
-    public function getPaginatedActiveJobsByCategoryQuery(Category $category) : AbstractQuery
+    public function getPaginatedActiveJobsByCategoryQuery(Category $category): AbstractQuery
     {
         return $this
             ->createQueryBuilder('j')
@@ -24,7 +24,7 @@ class JobRepository extends EntityRepository
             ->andWhere('j.expiresAt > :date')
             ->andWhere('j.activated = :activated')
             ->setParameter('category', $category)
-            ->setParameter('date', new \DateTime())
+            ->setParameter('date', new DateTime())
             ->setParameter('activated', true)
             ->getQuery();
     }
@@ -32,13 +32,14 @@ class JobRepository extends EntityRepository
     /**
      * @param int $id
      *
-     * @throws NonUniqueResultException
-     *
      * @return Job|null
+     *
+     * @throws NonUniqueResultException
      */
-    public function findActiveJob(int $id) : ?Job
+    public function findActiveJob(int $id): ?Job
     {
-        return $this->createQueryBuilder('j')
+        return $this
+            ->createQueryBuilder('j')
             ->where('j.id = :id')
             ->andWhere('j.expiresAt > :date')
             ->andWhere('j.activated = :activated')

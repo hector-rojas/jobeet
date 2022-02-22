@@ -53,57 +53,6 @@ class JobController extends AbstractController
     }
 
     /**
-     * Publish a job entity.
-     *
-     * @Route("job/{token}/publish", name="job.publish", methods="POST", requirements={"token" = "\w+"})
-     *
-     * @param Request $request
-     * @param Job $job
-     * @param EntityManagerInterface $em
-     *
-     * @return Response
-     */
-    public function publish(Request $request, Job $job, EntityManagerInterface $em): Response
-    {
-        $form = $this->createPublishForm($job);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $job->setActivated(true);
-
-            $em->flush();
-
-            $this->addFlash('notice', 'Your job was published');
-        }
-
-        return $this->redirectToRoute('job.preview', [
-            'token' => $job->getToken(),
-        ]);
-    }
-
-    /**
-     * Finds and displays the preview page for a job entity.
-     *
-     * @Route("job/{token}", name="job.preview", methods="GET", requirements={"token" = "\w+"})
-     *
-     * @param Job $job
-     *
-     * @return Response
-     */
-    public function preview(Job $job): Response
-    {
-        $deleteForm = $this->createDeleteForm($job);
-        $publishForm = $this->createPublishForm($job);
-
-        return $this->render('job/show.html.twig', [
-            'job' => $job,
-            'hasControlAccess' => true,
-            'deleteForm' => $deleteForm->createView(),
-            'publishForm' => $publishForm->createView(),
-        ]);
-    }
-
-    /**
      * Creates a new job entity.
      *
      * @Route("/job/create", name="job.create", methods={"GET", "POST"})
@@ -160,6 +109,28 @@ class JobController extends AbstractController
     }
 
     /**
+     * Finds and displays the preview page for a job entity.
+     *
+     * @Route("job/{token}", name="job.preview", methods="GET", requirements={"token" = "\w+"})
+     *
+     * @param Job $job
+     *
+     * @return Response
+     */
+    public function preview(Job $job): Response
+    {
+        $deleteForm = $this->createDeleteForm($job);
+        $publishForm = $this->createPublishForm($job);
+
+        return $this->render('job/show.html.twig', [
+            'job' => $job,
+            'hasControlAccess' => true,
+            'deleteForm' => $deleteForm->createView(),
+            'publishForm' => $publishForm->createView(),
+        ]);
+    }
+
+    /**
      * Delete a job entity.
      *
      * @Route("job/{token}/delete", name="job.delete", methods="DELETE", requirements={"token" = "\w+"})
@@ -181,6 +152,35 @@ class JobController extends AbstractController
         }
 
         return $this->redirectToRoute('job.list');
+    }
+
+    /**
+     * Publish a job entity.
+     *
+     * @Route("job/{token}/publish", name="job.publish", methods="POST", requirements={"token" = "\w+"})
+     *
+     * @param Request $request
+     * @param Job $job
+     * @param EntityManagerInterface $em
+     *
+     * @return Response
+     */
+    public function publish(Request $request, Job $job, EntityManagerInterface $em): Response
+    {
+        $form = $this->createPublishForm($job);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $job->setActivated(true);
+
+            $em->flush();
+
+            $this->addFlash('notice', 'Your job was published');
+        }
+
+        return $this->redirectToRoute('job.preview', [
+            'token' => $job->getToken(),
+        ]);
     }
 
     /**
