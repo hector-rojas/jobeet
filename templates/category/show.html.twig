@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Jobs in the {{ category.name }} category
+    {{ 'Jobs in the %category% category'|trans({'%category%': category.name}) }}
 {% endblock %}
 
 {% block body %}
